@@ -1,0 +1,786 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "box_api",
+    "description": "Box API for users",
+    "contact": {},
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/folder": {
+      "get": {
+        "tags": [
+          "Folder"
+        ],
+        "summary": "Search for documents in a folder",
+        "description": "Get file",
+        "operationId": "Searchfordocumentsinafolder",
+        "parameters": [
+          {
+            "name": "appUserId",
+            "in": "query",
+            "description": "app user id",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "folderId",
+            "in": "query",
+            "description": "folder id",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileName",
+            "in": "query",
+            "description": "folder id",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "offset",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "limit",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File or Folder obtained",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "App User or File/Folder not found",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File/Folder not found",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Service error",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "post": {
+        "tags": [
+          "Folder"
+        ],
+        "summary": "Create folder",
+        "description": "Create folder",
+        "operationId": "Createfolder",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FolderCreationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully created new folder",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FolderCreationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Some of the parameters are missing or not valid.",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The parent folder could not be found, or the authenticated user does not have access to the parent folder.",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The folder is locked or the folder already exists.",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/file": {
+      "get": {
+        "tags": [
+          "File"
+        ],
+        "summary": "Download file",
+        "description": "Get file",
+        "operationId": "Downloadfile",
+        "parameters": [
+          {
+            "name": "appUserId",
+            "in": "query",
+            "description": "app user id",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileId",
+            "in": "query",
+            "description": "file id",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A binary file",
+            "headers": {},
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "File is not ready to be downloaded.",
+            "headers": {
+              "Retry-After": {
+                "description": "Time in seconds after which the file will be available for the client to download.",
+                "content": {
+                  "text/plain": {
+                    "schema": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "post": {
+        "tags": [
+          "File"
+        ],
+        "summary": "Upload file",
+        "description": "Upload file",
+        "operationId": "Uploadfile",
+        "parameters": [
+          {
+            "name": "appUserId",
+            "in": "query",
+            "description": "app user id",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "boxFolderId",
+            "in": "query",
+            "description": "box folder id",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "encoding": {},
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Document ID of uploaded content is returned",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadFileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Folder error",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "File exists error",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "delete": {
+        "tags": [
+          "File"
+        ],
+        "summary": "Delete file",
+        "description": "Delete file",
+        "operationId": "Deletefile",
+        "parameters": [
+          {
+            "name": "appUserId",
+            "in": "query",
+            "description": "app user id",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileId",
+            "in": "query",
+            "description": "file id",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File deleted successfully.",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentDeletionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "App User or File/Folder not found",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File/Folder not found.",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "You cannot delete this file as it is already attached to a Case or is Verified.",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/file-view": {
+      "get": {
+        "tags": [
+          "File"
+        ],
+        "summary": "View file",
+        "description": "View file",
+        "operationId": "Viewfile",
+        "parameters": [
+          {
+            "name": "appUserId",
+            "in": "query",
+            "description": "app user id",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileId",
+            "in": "query",
+            "description": "file id",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "view metadata",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentViewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Some of the parameters are missing or not valid",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "document view error",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/file-link": {
+      "get": {
+        "tags": [
+          "File"
+        ],
+        "summary": "Link File",
+        "description": "Link File",
+        "operationId": "LinkFile",
+        "parameters": [
+          {
+            "name": "appUserId",
+            "in": "query",
+            "description": "app user id",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileId",
+            "in": "query",
+            "description": "file id",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "view metadata",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentLinkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Some of the parameters are missing or not valid",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "document link error",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceError"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SearchResult": {
+        "title": "SearchResult",
+        "type": "object",
+        "properties": {
+          "complete": {
+            "$ref": "#/components/schemas/Complete"
+          },
+          "fileData": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileInfo"
+            },
+            "description": ""
+          }
+        }
+      },
+      "FolderCreationRequest": {
+        "title": "FolderCreationRequest",
+        "required": [
+          "firstName",
+          "lastName",
+          "mpiid"
+        ],
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "description": "First name"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Last name"
+          },
+          "mpiid": {
+            "type": "string"
+          },
+          "logonuserid": {
+            "type": "string"
+          }
+        }
+      },
+      "FolderCreationResponse": {
+        "title": "FolderCreationResponse",
+        "type": "object",
+        "properties": {
+          "appUserId": {
+            "type": "string",
+            "description": "The unique identifier for the user the folder is associated with."
+          },
+          "folderId": {
+            "type": "string",
+            "description": "The unique identifier that represents the folder."
+          }
+        }
+      },
+      "UploadFileResponse": {
+        "title": "UploadFileResponse",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Status message for operation"
+          },
+          "fileId": {
+            "type": "string",
+            "description": "File ID of uploaded content"
+          }
+        }
+      },
+      "ServiceError": {
+        "title": "ServiceError",
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Error code"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error description"
+          }
+        }
+      },
+      "FileUploadData": {
+        "title": "FileUploadData",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "FileDownloadData": {
+        "title": "FileDownloadData",
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "FileInfo": {
+        "title": "FileInfo",
+        "type": "object",
+        "properties": {
+          "fileId": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "itemType": {
+            "$ref": "#/components/schemas/ItemType"
+          }
+        }
+      },
+      "DocumentDeletionResult": {
+        "title": "DocumentDeletionResult",
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "DocumentViewResponse": {
+        "title": "DocumentViewResponse",
+        "type": "object",
+        "properties": {
+          "previewUrl": {
+            "type": "string"
+          },
+          "shortPreviewUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "DocumentLinkResponse": {
+        "title": "DocumentLinkResponse",
+        "type": "object",
+        "properties": {
+          "linkUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "Complete": {
+        "title": "Complete",
+        "enum": [
+          "True",
+          "False"
+        ],
+        "type": "string"
+      },
+      "ItemType": {
+        "title": "ItemType",
+        "enum": [
+          "file",
+          "folder"
+        ],
+        "type": "string"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Folder",
+      "description": ""
+    },
+    {
+      "name": "File",
+      "description": ""
+    }
+  ]
+}
