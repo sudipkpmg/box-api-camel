@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties("box")
-public class AppProperties {
+public class BoxProperties {
 
     private String clientID;
     private String clientSecret;

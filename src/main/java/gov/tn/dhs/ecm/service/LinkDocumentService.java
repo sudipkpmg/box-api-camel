@@ -4,7 +4,7 @@ import com.box.sdk.BoxAPIException;
 import com.box.sdk.BoxDeveloperEditionAPIConnection;
 import com.box.sdk.BoxFile;
 import com.box.sdk.BoxSharedLink;
-import gov.tn.dhs.ecm.config.AppProperties;
+import gov.tn.dhs.ecm.config.BoxProperties;
 import gov.tn.dhs.ecm.model.DocumentLinkResult;
 import gov.tn.dhs.ecm.util.ConnectionHelper;
 import gov.tn.dhs.ecm.util.JsonUtil;
@@ -20,14 +20,14 @@ public class LinkDocumentService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(LinkDocumentService.class);
 
-    private AppProperties appProperties;
+    private BoxProperties boxProperties;
 
     public LinkDocumentService(
             ConnectionHelper connectionHelper,
-            AppProperties appProperties
+            BoxProperties boxProperties
     ) {
         super(connectionHelper);
-        this.appProperties = appProperties;
+        this.boxProperties = boxProperties;
     }
 
     public void process(Exchange exchange) {
@@ -44,7 +44,7 @@ public class LinkDocumentService extends BaseService {
             BoxFile file = new BoxFile(api, fileId);
             Date currentDate = new Date();
             long currentDateTimeval = currentDate.getTime();
-            long linkDuration = appProperties.getDocumentLinkDuration();
+            long linkDuration = boxProperties.getDocumentLinkDuration();
             long unshareDateTimeval = currentDateTimeval + linkDuration;
             Date unshareDate = new Date(unshareDateTimeval);
             BoxSharedLink.Permissions permissions = new BoxSharedLink.Permissions();

@@ -8,7 +8,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.endpoint.web.Link;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +32,7 @@ class BoxApiRoutes extends RouteBuilder {
     @Value("${server.port}")
     private String serverPort;
 
-    @Value("${runstatus}")
+    @Value("${runStatus}")
     private String runStatus;
 
     public BoxApiRoutes(
@@ -112,7 +111,7 @@ class BoxApiRoutes extends RouteBuilder {
         ;
         from("direct:runningStatus")
                 .log("Status request sent")
-                .log("runstatus property value is " + runStatus)
+                .log("runStatus property value is " + runStatus)
                 .process(exchange -> exchange.getIn().setBody(simpleMessage, SimpleMessage.class))
                 .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))
                 .setHeader("Content-Type", constant("application/json"))

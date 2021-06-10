@@ -2,7 +2,7 @@ package gov.tn.dhs.ecm.service;
 
 import com.box.sdk.*;
 import com.eclipsesource.json.JsonObject;
-import gov.tn.dhs.ecm.config.AppProperties;
+import gov.tn.dhs.ecm.config.BoxProperties;
 import gov.tn.dhs.ecm.model.FolderCreationRequest;
 import gov.tn.dhs.ecm.model.FolderCreationSuccessResponse;
 import gov.tn.dhs.ecm.util.ConnectionHelper;
@@ -27,11 +27,11 @@ public class CreateFolderService extends BaseService {
     // Changing this to 3 or 10, or something, would make testing easy.
     private final int MAX_FOLDER_SIZE = 20000;
 
-    private final AppProperties appProperties;
+    private final BoxProperties boxProperties;
 
-    public CreateFolderService(ConnectionHelper connectionHelper, AppProperties appProperties) {
+    public CreateFolderService(ConnectionHelper connectionHelper, BoxProperties boxProperties) {
         super(connectionHelper);
-        this.appProperties = appProperties;
+        this.boxProperties = boxProperties;
     }
 
     public void process(Exchange exchange) {
@@ -39,7 +39,7 @@ public class CreateFolderService extends BaseService {
         logger.info("folderCreationRequest = {}", JsonUtil.toJson(folderCreationRequest));
         try {
             BoxDeveloperEditionAPIConnection api = getBoxApiConnection();
-            api.asUser(appProperties.getAppUserId());
+            api.asUser(boxProperties.getAppUserId());
 
             String firstName = folderCreationRequest.getFirstName();
             String lastName = folderCreationRequest.getLastName();
@@ -54,7 +54,7 @@ public class CreateFolderService extends BaseService {
                 setupError("400", "Some of the parameters are missing or not valid");
             }
 
-            boolean citizensFolderByIdExists = this.checkIfCitizensFolderExists(api, appProperties.getRootCitizensFolderId(), mpiId);
+            boolean citizensFolderByIdExists = this.checkIfCitizensFolderExists(api, boxProperties.getRootCitizensFolderId(), mpiId);
             if (citizensFolderByIdExists) {
                 setupError("409", "Folder already exists!");
             }
@@ -83,18 +83,18 @@ public class CreateFolderService extends BaseService {
             // Apply metadata
             final JsonObject jsonObject = new JsonObject();
 
-            jsonObject.add(appProperties.getCitizenMetadataTemplateFirstName(), firstName);
-            jsonObject.add(appProperties.getCitizenMetadataTemplateLastName(), lastName);
-            jsonObject.add(appProperties.getCitizenMetadataTemplateMpiId(), mpiId);
-            jsonObject.add(appProperties.getCitizenMetadataTemplateLogonUserId(), logonUser);
+            jsonObject.add(boxProperties.getCitizenMetadataTemplateFirstName(), firstName);
+            jsonObject.add(boxProperties.getCitizenMetadataTemplateLastName(), lastName);
+            jsonObject.add(boxProperties.getCitizenMetadataTemplateMpiId(), mpiId);
+            jsonObject.add(boxProperties.getCitizenMetadataTemplateLogonUserId(), logonUser);
 
-            String scope = appProperties.getCitizenFolderMetadataTemplateScope();
+            String scope = boxProperties.getCitizenFolderMetadataTemplateScope();
             Metadata metadata = new Metadata(jsonObject);
-            boxFolder.createMetadata(appProperties.getCitizenMetadataTemplate(), scope, metadata);
+            boxFolder.createMetadata(boxProperties.getCitizenMetadataTemplate(), scope, metadata);
             // System.out.println("Metadata applied to the folder");
 
             // Create Metadata Cascade Policy on folder
-            boxFolder.addMetadataCascadePolicy(scope, appProperties.getCitizenMetadataTemplate());
+            boxFolder.addMetadataCascadePolicy(scope, boxProperties.getCitizenMetadataTemplate());
             // Note: Why not just use metadata cascade policy for the above metadata creation?
             // Because the Box Metadata Cascade Policy is quite unreliable. In manual testing as
             // of September 2020, it doesn't even reliably apply the metadata on the five children
@@ -179,11 +179,11 @@ public class CreateFolderService extends BaseService {
 
     private BoxFolder.Info createCitizensFolder(BoxDeveloperEditionAPIConnection api, String name) {
         // The root of all Citizens Folders
-        BoxFolder rootNode = new BoxFolder(api, appProperties.getRootCitizensFolderId());
+        BoxFolder rootNode = new BoxFolder(api, boxProperties.getRootCitizensFolderId());
 
         BoxFolder.Info superNode = this.getSuperNode(api, rootNode);
 
-        final int MAX_FOLDER_SIZE = appProperties.getMaxCitizensFoldersPerSubfolder();
+        final int MAX_FOLDER_SIZE = boxProperties.getMaxCitizensFoldersPerSubfolder();
 
 
         if (superNode == null || this.getFolderSize(api, superNode.getID()) >= MAX_FOLDER_SIZE) {
@@ -205,7 +205,7 @@ public class CreateFolderService extends BaseService {
         // for the absoultely correct way of iterating through all subfolders (possibly many
         // subfolders) to find the subfolder with the fewest items in it (potentially very
         // slow if there are many subfolders).
-        final int SUBFOLDER_LOOKBACK = appProperties.getCitizensFolderIterationLookback();
+        final int SUBFOLDER_LOOKBACK = boxProperties.getCitizensFolderIterationLookback();
 
         String sortField = "date";
         BoxFolder.SortDirection sortDirection = BoxFolder.SortDirection.DESC;
@@ -258,7 +258,7 @@ public class CreateFolderService extends BaseService {
      * Todo: Call in to Box Support to request the query index needed.
      */
     private boolean checkIfCitizensFolderExists(BoxDeveloperEditionAPIConnection api, String rootCitizensFolderId, String mpiId) {
-        String citizenMetadataTemplate = appProperties.getCitizenMetadataTemplate();
+        String citizenMetadataTemplate = boxProperties.getCitizenMetadataTemplate();
         MetadataTemplate metadataTemplate = null;
         try {
             metadataTemplate = MetadataTemplate.getMetadataTemplate(api, citizenMetadataTemplate);
@@ -266,12 +266,12 @@ public class CreateFolderService extends BaseService {
             e.printStackTrace();
         }
         String metadataScope = metadataTemplate.getScope();
-        String from = String.format("%s.%s", metadataScope, appProperties.getCitizenMetadataTemplate());
+        String from = String.format("%s.%s", metadataScope, boxProperties.getCitizenMetadataTemplate());
 
         String query = "";
         JsonObject queryParameters = new JsonObject();
         if ( (mpiId != null) && (mpiId.length() > 0) ) {
-            query = appProperties.getCitizenMetadataTemplateMpiId() + " = :mpiidArg";
+            query = boxProperties.getCitizenMetadataTemplateMpiId() + " = :mpiidArg";
             queryParameters.add("mpiidArg", mpiId);
         } else {
             return false;

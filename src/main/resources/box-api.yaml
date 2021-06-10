@@ -209,10 +209,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DocumentDeletionResult'
-              examples:
-                'delete successful':
-                  code: 200
-                  message: file deleted successfully
           description: File deleted successfully.
         '400':
           content:
@@ -256,10 +252,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DocumentViewResponse'
-              examples:
-                'view successful':
-                  code: 200
-                  message: file deleted successfully
           description: view metadata
         '400':
           content:

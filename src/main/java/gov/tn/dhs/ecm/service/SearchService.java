@@ -1,7 +1,7 @@
 package gov.tn.dhs.ecm.service;
 
 import com.box.sdk.*;
-import gov.tn.dhs.ecm.config.AppProperties;
+import gov.tn.dhs.ecm.config.BoxProperties;
 import gov.tn.dhs.ecm.model.CitizenMetadata;
 import gov.tn.dhs.ecm.model.FileInfo;
 import gov.tn.dhs.ecm.model.SearchResult;
@@ -20,14 +20,14 @@ public class SearchService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(SearchService.class);
 
-    private final AppProperties appProperties;
+    private final BoxProperties boxProperties;
 
     private static final String CITIZEN_METADATA_TEMPLATE = "CitizenFolderMetadataTemplate";
     private static final String CITIZEN_METADATA_SCOPE = "enterprise";
 
-    public SearchService(ConnectionHelper connectionHelper, AppProperties appProperties) {
+    public SearchService(ConnectionHelper connectionHelper, BoxProperties boxProperties) {
         super(connectionHelper);
-        this.appProperties = appProperties;
+        this.boxProperties = boxProperties;
     }
 
     public void process(Exchange exchange) {
@@ -49,7 +49,7 @@ public class SearchService extends BaseService {
         if (fileName == null) {
             try {
                 BoxFolder folder = new BoxFolder(api, folderId);
-                Metadata folderMetadata = folder.getMetadata(appProperties.getCitizenMetadataTemplate(), CITIZEN_METADATA_SCOPE);
+                Metadata folderMetadata = folder.getMetadata(boxProperties.getCitizenMetadataTemplate(), CITIZEN_METADATA_SCOPE);
                 logger.info(folderMetadata.toString());
                 List<FileInfo> files = new ArrayList<>();
                 PartialCollection<BoxItem.Info> items = folder.getChildrenRange(offset, limit);
@@ -73,7 +73,7 @@ public class SearchService extends BaseService {
             }
         } else {
             BoxFolder folder = new BoxFolder(api, folderId);
-            Metadata folderMetadata = folder.getMetadata(appProperties.getCitizenMetadataTemplate(), CITIZEN_METADATA_SCOPE);
+            Metadata folderMetadata = folder.getMetadata(boxProperties.getCitizenMetadataTemplate(), CITIZEN_METADATA_SCOPE);
             limit++;
             long position = offset;
             long count = 0;
