@@ -3,18 +3,24 @@
 
 <configuration>
 
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+<!--    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">-->
+<!--        <layout class="ch.qos.logback.classic.PatternLayout">-->
+<!--            <Pattern>-->
+<!--                %date [%thread] %-5level %logger - %msg%n-->
+<!--            </Pattern>-->
+<!--        </layout>-->
+<!--    </appender>-->
 
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %date [%thread] %-5level %logger - %msg%n
-            </Pattern>
-        </layout>
+<!--    <root level="INFO">-->
+<!--        <appender-ref ref="CONSOLE" />-->
+<!--    </root>-->
 
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="com.newrelic.logging.logback.NewRelicEncoder"/>
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="STDOUT" />
     </root>
 
 </configuration>
