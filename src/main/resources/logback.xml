@@ -1,27 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
 
-<configuration>
+<!--<configuration>-->
 
-<!--    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">-->
-<!--        <layout class="ch.qos.logback.classic.PatternLayout">-->
-<!--            <Pattern>-->
-<!--                %date [%thread] %-5level %logger - %msg%n-->
-<!--            </Pattern>-->
-<!--        </layout>-->
+<!--&lt;!&ndash;    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">&ndash;&gt;-->
+<!--&lt;!&ndash;        <layout class="ch.qos.logback.classic.PatternLayout">&ndash;&gt;-->
+<!--&lt;!&ndash;            <Pattern>&ndash;&gt;-->
+<!--&lt;!&ndash;                %date [%thread] %-5level %logger - %msg%n&ndash;&gt;-->
+<!--&lt;!&ndash;            </Pattern>&ndash;&gt;-->
+<!--&lt;!&ndash;        </layout>&ndash;&gt;-->
+<!--&lt;!&ndash;    </appender>&ndash;&gt;-->
+
+<!--&lt;!&ndash;    <root level="INFO">&ndash;&gt;-->
+<!--&lt;!&ndash;        <appender-ref ref="CONSOLE" />&ndash;&gt;-->
+<!--&lt;!&ndash;    </root>&ndash;&gt;-->
+
+<!--    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">-->
+<!--        <encoder class="com.newrelic.logging.logback.NewRelicEncoder"/>-->
 <!--    </appender>-->
 
 <!--    <root level="INFO">-->
-<!--        <appender-ref ref="CONSOLE" />-->
+<!--        <appender-ref ref="STDOUT" />-->
 <!--    </root>-->
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="com.newrelic.logging.logback.NewRelicEncoder"/>
-    </appender>
+<!--</configuration>-->
 
-    <root level="INFO">
-        <appender-ref ref="STDOUT" />
-    </root>
+<configuration>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+
+    <!-- changed the encoder -->
+      <encoder class="com.newrelic.logging.logback.NewRelicEncoder"/>
+
+  </appender>
+
+  <!-- added the ASYNC appender -->
+  <appender name="ASYNC" class="com.newrelic.logging.logback.NewRelicAsyncAppender">
+    <appender-ref ref="STDOUT" />
+  </appender>
+
+  <root level="debug">
+
+    <!-- changed the root logger -->
+      <appender-ref ref="ASYNC" />
+
+  </root>
 
 </configuration>
-
